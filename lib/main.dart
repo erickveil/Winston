@@ -262,23 +262,29 @@ class _MyHomePageState extends State<MyHomePage> {
                             ],
                           ),
                         ),
-                        
-
                       ],
-                    )
+                    ),
+                  ),
+                ),
 
-                  )
+                // Draw Button
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _drawCard,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    child: Text(_drawnCard == null ? 'Draw Card' : 'Draw Another Card'),
+                  ),
+
                 )
 
           ],
-
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _drawCard,
-        tooltip: 'Draw Card',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
