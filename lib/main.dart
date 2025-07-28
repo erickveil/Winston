@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Load and parse tarot card JSON
   Future<List<dynamic>> _loadTarotCards() async {
-    final String response = await rootBundle.loadString('assets/tarot_cards.json');
+    final String response = await rootBundle.loadString('assets/tarotData.json');
     return jsonDecode(response);
   }
 
@@ -94,6 +94,10 @@ class _MyHomePageState extends State<MyHomePage> {
       final cards = await _loadTarotCards();
       final int randomIndex = _random.nextInt(cards.length);
       final bool isUpright = _random.nextBool();
+
+      // print the card details for debugging
+      print('Drawing card at index $randomIndex, isUpright: $isUpright');
+      print('Card data: ${cards[randomIndex]}');
 
       setState(() {
         _drawnCard = TarotCard.fromJson(cards[randomIndex], isUpright);
@@ -149,15 +153,15 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              'Hello World',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: _drawCard,
+        tooltip: 'Draw Card',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
