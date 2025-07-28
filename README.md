@@ -8,7 +8,7 @@ The intent of this project is to learn more about Flutter with a simple app.
 
 This app will be a "Tarot Card" app.
 
-## Phase 1
+## Phase 1 (✔ Complete!)
 
 - User can click a button. It will describe the card drawn, its orientation, its meaning.
 
