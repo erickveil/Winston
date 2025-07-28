@@ -86,8 +86,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Draw a random tarot card
   Future<void> _drawCard() async {
+    setState(() {
+      _isLoading = true;
+    });
 
+    try {
+      final cards = await _loadTarotCards();
+      final int randomIndex = _random.nextInt(cards.length);
+      final bool isUpright = _random.nextBool();
 
+      setState(() {
+        _drawnCard = TarotCard.fromJson(cards[randomIndex], isUpright);
+        _isLoading = false;
+      });
+      
+    } catch(e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error loading tarot cards: $e');
+    }
   }
 
   @override
