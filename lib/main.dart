@@ -147,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
 
-            // Card display seciont - shown when a card is drawn
+            // Card display secion - shown when a card is drawn
             if (_drawnCard != null && !_isLoading)
               Expanded(
                   child: SingleChildScrollView(
@@ -164,6 +164,78 @@ class _MyHomePageState extends State<MyHomePage> {
                             textAlign: TextAlign.center,
                           ),
                         ),
+
+                        // Card imagery
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.shade50,
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: Colors.purple.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _drawnCard!.imagery,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Spacer ---------------------------------------------
+                        const SizedBox(height: 16),
+
+
+                        // Card orientation
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            // Change color based on orientation
+                            color: _drawnCard!.isUpright
+                              ? Colors.blue.shade50
+                              : Colors.orange.shade50,
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(
+                              color: _drawnCard!.isUpright
+                                ? Colors.blue.shade200
+                                : Colors.orange.shade200
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _drawnCard!.isUpright 
+                                  ? Icons.arrow_upward
+                                  : Icons.arrow_downward,
+                                color: _drawnCard!.isUpright 
+                                  ? Colors.blue 
+                                  : Colors.orange
+                              ),
+
+                              // Row Spacer
+                              const SizedBox(width: 8),
+
+                              Text(
+                                _drawnCard!.orientation,
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: _drawnCard!.isUpright 
+                                    ? Colors.blue.shade700 
+                                    : Colors.orange.shade700
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Spacer ---------------------------------------------
+                        const SizedBox(height: 16),
+
+                        // Card meaning
+
                       ],
                     )
 
