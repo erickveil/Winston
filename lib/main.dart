@@ -235,6 +235,34 @@ class _MyHomePageState extends State<MyHomePage> {
                         const SizedBox(height: 16),
 
                         // Card meaning
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade50,
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(color: Colors.green.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Meanings:',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              // Text Spacer
+                              const SizedBox(height: 8),
+
+                              Text(
+                                _drawnCard!.meaning,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        
 
                       ],
                     )
