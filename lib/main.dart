@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'models/tarot_card.dart';
+import 'services/tarot_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,16 +30,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -51,12 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = false;
   final Random _random = Random();
 
-  // Load and parse tarot card JSON
-  Future<List<dynamic>> _loadTarotCards() async {
-    final String response = await rootBundle.loadString('assets/tarotData.json');
-    return jsonDecode(response);
-  }
-
   // Draw a random tarot card
   Future<void> _drawCard() async {
     setState(() {
@@ -64,16 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     try {
-      final cards = await _loadTarotCards();
-      final int randomIndex = _random.nextInt(cards.length);
-      final bool isUpright = _random.nextBool();
-
-      // print the card details for debugging
-      print('Drawing card at index $randomIndex, isUpright: $isUpright');
-      print('Card data: ${cards[randomIndex]}');
-
+      final card = await TarotService.drawRandomCard();
       setState(() {
-        _drawnCard = TarotCard.fromJson(cards[randomIndex], isUpright);
+        _drawnCard = card;
         _isLoading = false;
       });
       

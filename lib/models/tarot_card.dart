@@ -1,6 +1,6 @@
-import 'dart:math';
-
+/// A model class representing a Tarot card with its properties.
 class TarotCard {
+
   final String name;
   final String imagery;
   final String uprightMeaning;
@@ -15,6 +15,11 @@ class TarotCard {
     required this.isUpright,
   });
 
+  /// Factory constructor to create a TarotCard instance from JSON data.
+  /// [json] is a map containing the card data.
+  /// [isUpright] indicates whether the card is drawn upright or inverted.
+  /// If a field is missing in the JSON, default values are provided.
+  /// Returns a valid TarotCard instance.
   factory TarotCard.fromJson(Map<String, dynamic> json, bool isUpright) {
     return TarotCard(
       name: json['name'] ?? 'Unknown Card',
