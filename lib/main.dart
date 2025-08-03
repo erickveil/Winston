@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'models/tarot_card.dart';
 import 'services/tarot_service.dart';
 import 'widgets/card_display.dart';
+import 'widgets/draw_button.dart';
 
 void main() {
   runApp(const MyApp());
@@ -103,19 +104,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: TarotCardDisplay(card: _drawnCard!),
               ),
 
-            // Draw Button
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _drawCard,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                ),
-                child: Text(_drawnCard == null ? 'Draw Card' : 'Draw Another Card'),
-              ),
-            )
+            // Button for drawing a card
+            DrawButton(
+              isLoading: _isLoading,
+              hasDrawnCard: _drawnCard != null,
+              onPressed: _drawCard,
+            ),
 
           ],
         ),
