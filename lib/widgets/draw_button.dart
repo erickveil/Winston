@@ -6,11 +6,11 @@ class DrawButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const DrawButton({
-    Key? key,
+    super.key,
     required this.isLoading,
     required this.hasDrawnCard,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

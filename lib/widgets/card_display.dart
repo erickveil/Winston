@@ -5,9 +5,9 @@ class TarotCardDisplay extends StatelessWidget {
   final TarotCard card;
   
   const TarotCardDisplay({
-    Key? key,
+    super.key,
     required this.card,
-  }) : super(key: key);
+  });
   
   @override
   Widget build(BuildContext context) {
