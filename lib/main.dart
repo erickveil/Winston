@@ -3,11 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'models/tarot_card.dart';
+import 'services/card_index_service.dart';
 import 'services/tarot_service.dart';
 import 'widgets/card_display.dart';
 import 'widgets/draw_button.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final  cardIndexService = await CardIndexService.initialize();
+
   runApp(const MyApp());
 }
 
