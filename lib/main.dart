@@ -11,6 +11,7 @@ import 'widgets/draw_button.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final  cardIndexService = await CardIndexService.initialize();
+  TarotService.setCardIndexService(cardIndexService);
 
   runApp(const MyApp());
 }
