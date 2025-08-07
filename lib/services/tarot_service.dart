@@ -37,8 +37,15 @@ class TarotService {
       final imagePath = _cardIndexService!.getImagePathForCard(card.name);
       if (imagePath != null) {
         card.imagePath = imagePath;
+        print('Matched card "${card.name}" with image path: $imagePath');
+      }
+      else {
+        print('No image match found for card "${card.name}"');
       }
 
+    }
+    else {
+      print('CardIndexService not set. Cannot match images.');
     }
 
     return card;
