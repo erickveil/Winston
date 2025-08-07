@@ -6,6 +6,7 @@ class TarotCard {
   final String uprightMeaning;
   final String invertedMeaning;
   final bool isUpright;
+  String? imagePath;
 
   TarotCard({
     required this.name, 
@@ -13,6 +14,7 @@ class TarotCard {
     required this.uprightMeaning,
     required this.invertedMeaning,
     required this.isUpright,
+    this.imagePath,
   });
 
   /// Factory constructor to create a TarotCard instance from JSON data.
