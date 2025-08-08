@@ -11,17 +11,88 @@ class TarotCardDisplay extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWideScreen = screenWidth > 600;
+
+    if (isWideScreen) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildCardHeader(context),
-          _buildCardImagery(context),
-          const SizedBox(height: 16),
-          _buildCardOrientation(context),
-          const SizedBox(height: 16),
-          _buildCardMeaning(context),
+          // Card image on the left at 1/3 width
+          Expanded(
+            flex: 1,
+            child: _buildCardImage(),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 2,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCardHeader(context),
+                  _buildCardImagery(context),
+                  const SizedBox(height: 16),
+                  _buildCardOrientation(context),
+                  const SizedBox(height: 16),
+                  _buildCardMeaning(context),
+                ],
+              ),
+            ),
+          ),
         ],
+      );
+    } else {
+      // Stacked layout for narrower screens
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCardHeader(context),
+            const SizedBox(height: 16),
+            // Card image centered
+            SizedBox(
+              height: 300,
+              child: Center(
+                child: _buildCardImage(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildCardImagery(context),
+            const SizedBox(height: 16),
+            _buildCardOrientation(context),
+            const SizedBox(height: 16),
+            _buildCardMeaning(context),
+          ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildCardImage() {
+    // No image path
+    if (card.imagePath == null) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Center(
+          child: Text('No Image Available'),
+        ),
+      );
+    }
+
+    // Image path in model
+    return RotatedBox(
+      quarterTurns: card.isUpright ? 0 : 2,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset(
+          card.imagePath!,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
