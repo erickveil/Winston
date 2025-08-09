@@ -45,7 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TarotCard? _drawnCard;
   bool _isLoading = false;
-  final Random _random = Random();
 
   // Draw a random tarot card
   Future<void> _drawCard() async {
