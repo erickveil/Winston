@@ -7,6 +7,7 @@ import 'services/card_index_service.dart';
 import 'services/tarot_service.dart';
 import 'widgets/card_display.dart';
 import 'widgets/draw_button.dart';
+import 'widgets/settings_form.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -136,15 +137,13 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Settings'),
-          content: const Text('Settings dialog content goes here.'),
-          actions: [
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 300, maxWidth: 400),
+              child: const SettingsForm(),
             ),
-          ],
+          ),
+          actions:[ ],
         );
       },
     );
