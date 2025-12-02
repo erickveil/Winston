@@ -53,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TarotCard? _drawnCard;
   bool _isLoading = false;
+  bool _hasInterpretation = false;
   
   // Controller for the user's question that persists across card draws
   late TextEditingController _questionController;
@@ -73,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _drawCard() async {
     setState(() {
       _isLoading = true;
+      _hasInterpretation = false;
     });
 
     try {
@@ -88,6 +90,22 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       print('Error loading tarot cards: $e');
     }
+  }
+
+  // Reset the app to starting state
+  void _resetApp() {
+    setState(() {
+      _drawnCard = null;
+      _hasInterpretation = false;
+      _questionController.clear();
+    });
+  }
+
+  // Called when an interpretation is generated
+  void _onInterpretationGenerated() {
+    setState(() {
+      _hasInterpretation = true;
+    });
   }
 
   @override
@@ -177,16 +195,31 @@ class _MyHomePageState extends State<MyHomePage> {
                   interpretationPanel: AiInterpretationPanel(
                     card: _drawnCard!,
                     questionController: _questionController,
+                    onInterpretationGenerated: _onInterpretationGenerated,
                   ),
                 ),
               ),
 
-            // Button for drawing a card
-            DrawButton(
-              isLoading: _isLoading,
-              hasDrawnCard: _drawnCard != null,
-              onPressed: _drawCard,
-            ),
+            // Button for drawing a card or starting over
+            if (!_hasInterpretation)
+              DrawButton(
+                isLoading: _isLoading,
+                hasDrawnCard: _drawnCard != null,
+                onPressed: _drawCard,
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: ElevatedButton(
+                  onPressed: _resetApp,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                  child: const Text('Start Over'),
+                ),
+              ),
 
           ],
         ),

@@ -6,11 +6,13 @@ import '../services/ai_service.dart';
 class AiInterpretationPanel extends StatefulWidget {
   final TarotCard card;
   final TextEditingController questionController;
+  final VoidCallback? onInterpretationGenerated;
 
   const AiInterpretationPanel({
     super.key,
     required this.card,
     required this.questionController,
+    this.onInterpretationGenerated,
   });
 
   @override
@@ -72,6 +74,8 @@ Please provide a meaningful interpretation that connects the card's symbolism to
           _aiInterpretation = interpretation;
           _isLoadingInterpretation = false;
         });
+        // Notify parent that interpretation was generated
+        widget.onInterpretationGenerated?.call();
       }
     } catch (e) {
       if (mounted) {
@@ -88,29 +92,36 @@ Please provide a meaningful interpretation that connects the card's symbolism to
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Button to generate AI interpretation
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _isLoadingInterpretation ? null : _generateInterpretation,
-            icon: _isLoadingInterpretation
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                  ),
-                )
-              : const Icon(Icons.auto_fix_high),
-            label: Text(
-              _isLoadingInterpretation 
-                ? 'Generating Interpretation...' 
-                : 'Get AI Interpretation',
+        // Button to generate AI interpretation - only show if no interpretation yet
+        if (_aiInterpretation == null && !_isLoadingInterpretation)
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isLoadingInterpretation ? null : _generateInterpretation,
+              icon: const Icon(Icons.auto_fix_high),
+              label: const Text('Get AI Interpretation'),
             ),
           ),
-        ),
 
-        const SizedBox(height: 16),
+        // Loading indicator
+        if (_isLoadingInterpretation)
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: null,
+              icon: const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              ),
+              label: const Text('Generating Interpretation...'),
+            ),
+          ),
+
+        if (_isLoadingInterpretation || _aiInterpretation != null)
+          const SizedBox(height: 16),
 
         // Output section for AI interpretation
         if (_errorMessage != null)
@@ -165,23 +176,6 @@ Please provide a meaningful interpretation that connects the card's symbolism to
                   ),
                 ),
               ],
-            ),
-          ),
-
-        if (_aiInterpretation == null && _errorMessage == null && !_isLoadingInterpretation)
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Center(
-              child: Text(
-                'Click "Get AI Interpretation" to receive guidance',
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
             ),
           ),
       ],
