@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/tarot_card.dart';
 import '../models/config.dart';
 import '../services/ai_service.dart';
@@ -31,6 +32,19 @@ class _AiInterpretationPanelState extends State<AiInterpretationPanel> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  /// Copy the interpretation to clipboard
+  void _copyToClipboard() {
+    if (_aiInterpretation != null) {
+      Clipboard.setData(ClipboardData(text: _aiInterpretation!));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Interpretation copied to clipboard'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   /// Generates an AI interpretation based on the card and user's question
@@ -160,15 +174,28 @@ Please provide a meaningful interpretation that connects the card's symbolism to
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Interpretation:',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Interpretation:',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.content_copy),
+                      tooltip: 'Copy to clipboard',
+                      onPressed: _copyToClipboard,
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.all(4),
+                      iconSize: 20,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 SingleChildScrollView(
-                  child: Text(
+                  child: SelectableText(
                     _aiInterpretation!,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
