@@ -5,10 +5,12 @@ import '../services/ai_service.dart';
 /// Widget for displaying AI-powered tarot card interpretation
 class AiInterpretationPanel extends StatefulWidget {
   final TarotCard card;
+  final TextEditingController questionController;
 
   const AiInterpretationPanel({
     super.key,
     required this.card,
+    required this.questionController,
   });
 
   @override
@@ -16,7 +18,6 @@ class AiInterpretationPanel extends StatefulWidget {
 }
 
 class _AiInterpretationPanelState extends State<AiInterpretationPanel> {
-  late TextEditingController _questionController;
   final AiService _aiService = AiService();
   
   String? _aiInterpretation;
@@ -24,20 +25,13 @@ class _AiInterpretationPanelState extends State<AiInterpretationPanel> {
   String? _errorMessage;
 
   @override
-  void initState() {
-    super.initState();
-    _questionController = TextEditingController();
-  }
-
-  @override
   void dispose() {
-    _questionController.dispose();
     super.dispose();
   }
 
   /// Generates an AI interpretation based on the card and user's question
   Future<void> _generateInterpretation() async {
-    if (_questionController.text.isEmpty) {
+    if (widget.questionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a question or scenario')),
       );
@@ -63,7 +57,7 @@ Orientation: ${widget.card.orientation}
 Card Meaning: ${widget.card.meaning}
 Card Imagery: ${widget.card.imagery}
 
-My Question/Situation: ${_questionController.text}
+My Question/Situation: ${widget.questionController.text}
 
 Please provide a meaningful interpretation that connects the card's symbolism to my situation.''';
 
@@ -94,59 +88,25 @@ Please provide a meaningful interpretation that connects the card's symbolism to
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Input section for user's question
-        Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.indigo.shade50,
-            borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(color: Colors.indigo.shade200),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Your Question or Situation:',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _questionController,
-                maxLines: 5,
-                minLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Enter your question or describe your situation...',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+        // Button to generate AI interpretation
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _isLoadingInterpretation ? null : _generateInterpretation,
+            icon: _isLoadingInterpretation
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoadingInterpretation ? null : _generateInterpretation,
-                  icon: _isLoadingInterpretation
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Icon(Icons.auto_fix_high),
-                  label: Text(
-                    _isLoadingInterpretation 
-                      ? 'Generating Interpretation...' 
-                      : 'Get AI Interpretation',
-                  ),
-                ),
-              ),
-            ],
+                )
+              : const Icon(Icons.auto_fix_high),
+            label: Text(
+              _isLoadingInterpretation 
+                ? 'Generating Interpretation...' 
+                : 'Get AI Interpretation',
+            ),
           ),
         ),
 
@@ -218,7 +178,7 @@ Please provide a meaningful interpretation that connects the card's symbolism to
             ),
             child: Center(
               child: Text(
-                'Enter your question and click "Get AI Interpretation" to receive guidance',
+                'Click "Get AI Interpretation" to receive guidance',
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),

@@ -53,6 +53,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TarotCard? _drawnCard;
   bool _isLoading = false;
+  
+  // Controller for the user's question that persists across card draws
+  late TextEditingController _questionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _questionController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _questionController.dispose();
+    super.dispose();
+  }
 
   // Draw a random tarot card
   Future<void> _drawCard() async {
@@ -97,14 +112,49 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
 
+            // Question input section - always visible at the top
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.indigo.shade50,
+                borderRadius: BorderRadius.circular(12.0),
+                border: Border.all(color: Colors.indigo.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Your Question or Situation:',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _questionController,
+                    maxLines: 4,
+                    minLines: 2,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your question or describe your situation...',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
             // Show a message when no card is drawn
             if(_drawnCard == null && !_isLoading)
-              // Expanded will fill the available space of the column
               Expanded (
-                // This will center the content vertically and horizontally
                 child: Center(
                   child: Text(
-                    'Press the button to draw a tarot card.',
+                    'Press the button below to draw a tarot card.',
                     style: Theme.of(context).textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
@@ -119,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
 
-            // Card display secion - shown when a card is drawn
+            // Card display section - shown when a card is drawn
             if (_drawnCard != null && !_isLoading)
               Expanded(
                 child: SingleChildScrollView(
@@ -128,7 +178,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       TarotCardDisplay(card: _drawnCard!),
                       const SizedBox(height: 24),
-                      AiInterpretationPanel(card: _drawnCard!),
+                      // Pass the question controller to the interpretation panel
+                      AiInterpretationPanel(
+                        card: _drawnCard!,
+                        questionController: _questionController,
+                      ),
                     ],
                   ),
                 ),
