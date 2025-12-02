@@ -12,16 +12,9 @@ This app is a "Tarot Card" app.
 
 - The app will display the drawn card.
 
-## Phase 3
+## Phase 3 (✔ Complete!)
 
 - The user can enter a "question" in a text box.
 - When the card is drawn, a REST call will be made to a LLM API.
 - The app will also respond with a generated inteperetation based on the card and its meaning.
-
-## Phase 4
-
-- Option for two card spreads
-
-## Phase 5
-
-- Option for other spread types
+- The app also generates responses for tarot-powered solo RPG sessions.
