@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'models/config.dart';
 import 'models/tarot_card.dart';
@@ -22,19 +23,38 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _appTitle = 'Winston Tarot Medium';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersionInfo();
+  }
+
+  Future<void> _loadVersionInfo() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _appTitle = 'Winston Tarot Medium v${packageInfo.version}';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Winston Tarot Medium',
+      title: _appTitle,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Winston Tarot Medium'),
+      home: MyHomePage(title: _appTitle),
     );
   }
 }
