@@ -21,6 +21,11 @@ class _SettingsFormState extends State<SettingsForm> {
 
   // Config instance
   final Config _config = Config();
+  
+  // Selected mode
+  late String _selectedMode;
+  
+  bool _isSaving = false;
 
   // Initialize controllers with current values
   @override
@@ -29,6 +34,7 @@ class _SettingsFormState extends State<SettingsForm> {
     _urlController = TextEditingController(text: _config.url);
     _authController = TextEditingController(text: _config.authorization);
     _modelController = TextEditingController(text: _config.model);
+    _selectedMode = _config.selectedMode;
   }
 
   // Clean up controllers
@@ -43,11 +49,16 @@ class _SettingsFormState extends State<SettingsForm> {
   // Save Settings
   Future<void> _saveSettings() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isSaving = true;
+      });
+      
       try {
         await _config.updateConfig(
           url: _urlController.text,
           authorization: _authController.text,
           model: _modelController.text,
+          selectedMode: _selectedMode,
         );
 
         // Close the dialog
@@ -65,6 +76,12 @@ class _SettingsFormState extends State<SettingsForm> {
             SnackBar(content: Text('Error saving settings: $e')),
           );
         }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isSaving = false;
+          });
+        }
       }
     }
   }
@@ -76,6 +93,29 @@ class _SettingsFormState extends State<SettingsForm> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Mode selector
+          DropdownButtonFormField<String>(
+            value: _selectedMode,
+            decoration: const InputDecoration(
+              labelText: 'Mode',
+              hintText: 'Select the app mode',
+            ),
+            items: Config.modes.keys.map((String mode) {
+              return DropdownMenuItem<String>(
+                value: mode,
+                child: Text(_getModeLabel(mode)),
+              );
+            }).toList(),
+            onChanged: (String? newMode) {
+              if (newMode != null) {
+                setState(() {
+                  _selectedMode = newMode;
+                });
+              }
+            },
+          ),
+          const SizedBox(height: 16),
+          
           TextFormField(
             controller: _urlController,
             decoration: const InputDecoration(
@@ -86,24 +126,22 @@ class _SettingsFormState extends State<SettingsForm> {
               if (value == null || value.isEmpty) {
                 return 'Please enter a URL';
               }
-              // TODO: Do we need URL validation?
               return null;
             },
           ),
-
           const SizedBox(height: 16),
-
+          
           TextFormField(
             controller: _authController,
             decoration: const InputDecoration(
               labelText: 'API Key',
               hintText: 'Enter the Open AI API key',
+              helperText: 'Leave blank for local Ollama or similar services',
             ),
             obscureText: true,
           ),
-
           const SizedBox(height: 16),
-
+          
           TextFormField(
             controller: _modelController,
             decoration: const InputDecoration(
@@ -117,9 +155,9 @@ class _SettingsFormState extends State<SettingsForm> {
               return null;
             },
           ),
-
+          
           const SizedBox(height: 24),
-
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -129,14 +167,35 @@ class _SettingsFormState extends State<SettingsForm> {
               ),
               const SizedBox(width: 16),
               ElevatedButton(
-                onPressed: _saveSettings,
-                child: const Text('SAVE'),
+                onPressed: _isSaving ? null : _saveSettings,
+                child: _isSaving 
+                  ? const SizedBox(
+                      width: 20, 
+                      height: 20, 
+                      child: CircularProgressIndicator(strokeWidth: 2)
+                    )
+                  : const Text('SAVE'),
               ),
             ],
           ),
         ],
       ),
     );
+  }
+  
+  String _getModeLabel(String mode) {
+    switch (mode) {
+      case 'tarot_reading':
+        return 'Tarot Card Reading';
+      case 'ttrpg_scene':
+        return 'TTRPG Scene Generator';
+      case 'npc_creator':
+        return 'NPC Creator';
+      case 'dungeon_room':
+        return 'Dungeon Room Generator';
+      default:
+        return mode;
+    }
   }
 
 

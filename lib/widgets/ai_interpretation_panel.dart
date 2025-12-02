@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/tarot_card.dart';
+import '../models/config.dart';
 import '../services/ai_service.dart';
 
 /// Widget for displaying AI-powered tarot card interpretation
@@ -21,6 +22,7 @@ class AiInterpretationPanel extends StatefulWidget {
 
 class _AiInterpretationPanelState extends State<AiInterpretationPanel> {
   final AiService _aiService = AiService();
+  final Config _config = Config();
   
   String? _aiInterpretation;
   bool _isLoadingInterpretation = false;
@@ -46,11 +48,7 @@ class _AiInterpretationPanelState extends State<AiInterpretationPanel> {
     });
 
     try {
-      final systemPrompt = '''You are an experienced and insightful tarot card reader and psychic medium. 
-Your role is to provide meaningful, thoughtful interpretations of tarot cards in the context of a person's question or situation.
-Consider the card's symbolism, its orientation (upright or inverted), and the traditional meanings provided.
-Offer guidance that is compassionate, helpful, and thought-provoking.
-Keep your interpretation between 2-4 paragraphs.''';
+      final systemPrompt = _config.getCurrentSystemPrompt();
 
       final userMessage = '''Please interpret this tarot card reading for me:
 
