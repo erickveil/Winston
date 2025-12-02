@@ -41,22 +41,31 @@ class _SettingsFormState extends State<SettingsForm> {
   }
 
   // Save Settings
-  void _saveSettings() {
+  Future<void> _saveSettings() async {
     if (_formKey.currentState!.validate()) {
-      _config.updateConfig(
-        url: _urlController.text,
-        authorization: _authController.text,
-        model: _modelController.text,
-      );
+      try {
+        await _config.updateConfig(
+          url: _urlController.text,
+          authorization: _authController.text,
+          model: _modelController.text,
+        );
 
-      // Close the dialog
-      Navigator.of(context).pop();
+        // Close the dialog
+        if (mounted) Navigator.of(context).pop();
 
-      // Show confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Settings saved')),
-      );
-
+        // Show confirmation
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Settings saved')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error saving settings: $e')),
+          );
+        }
+      }
     }
   }
 

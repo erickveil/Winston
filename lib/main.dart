@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'models/config.dart';
 import 'models/tarot_card.dart';
 import 'services/card_index_service.dart';
 import 'services/tarot_service.dart';
@@ -11,6 +12,11 @@ import 'widgets/settings_form.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load saved config
+  final config = Config();
+  await config.loadFromPrefs();
+  
   final  cardIndexService = await CardIndexService.initialize();
   TarotService.setCardIndexService(cardIndexService);
 

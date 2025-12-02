@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Config {
 
   // Singleton
@@ -14,7 +16,31 @@ class Config {
   String authorization = '';
   String model = 'gpt-4.1-nano';
 
-  void updateConfig({String? url, String? authorization, String? model}) {
+  // Storage keys
+  static const String _urlKey = 'config_url';
+  static const String _authKey = 'config_authorization';
+  static const String _modelKey = 'config_model';
+
+  /// Load saved values from SharedPreferences
+  Future<void> loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    url = prefs.getString(_urlKey) ?? url;
+    authorization = prefs.getString(_authKey) ?? authorization;
+    model = prefs.getString(_modelKey) ?? model;
+  }
+
+  /// Save current values to SharedPreferences
+  Future<void> saveToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    await prefs.setString(_urlKey, url);
+    await prefs.setString(_authKey, authorization);
+    await prefs.setString(_modelKey, model);
+  }
+
+  /// Update config and save changes to persistent storage
+  Future<void> updateConfig({String? url, String? authorization, String? model}) async {
     if (url != null) {
       this.url = url;
     }
@@ -24,6 +50,9 @@ class Config {
     if (model != null) {
       this.model = model;
     }
+    
+    // Save changes to persistent storage
+    await saveToPrefs();
   }
 
 }
