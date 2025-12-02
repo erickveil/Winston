@@ -278,7 +278,7 @@ class CardIndexService {
     
     // If there are multiple words, take the first substantive word
     List<String> words = cleanName.split(' ');
-    if (words.length > 0) {
+    if (words.isNotEmpty) {
       return words[0];
     }
     
