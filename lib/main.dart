@@ -52,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TarotCard? _drawnCard;
   bool _isLoading = false;
   bool _hasInterpretation = false;
+  String? _interpretation;
   
   // Controller for the user's question that persists across card draws
   late TextEditingController _questionController;
@@ -95,13 +96,15 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _drawnCard = null;
       _hasInterpretation = false;
+      _interpretation = null;
       _questionController.clear();
     });
   }
 
   // Called when an interpretation is generated
-  void _onInterpretationGenerated() {
+  void _onInterpretationGenerated(String interpretation) {
     setState(() {
+      _interpretation = interpretation;
       _hasInterpretation = true;
     });
   }
@@ -193,6 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   interpretationPanel: AiInterpretationPanel(
                     card: _drawnCard!,
                     questionController: _questionController,
+                    interpretation: _interpretation,
                     onInterpretationGenerated: _onInterpretationGenerated,
                   ),
                 ),

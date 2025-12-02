@@ -8,13 +8,15 @@ import '../services/ai_service.dart';
 class AiInterpretationPanel extends StatefulWidget {
   final TarotCard card;
   final TextEditingController questionController;
-  final VoidCallback? onInterpretationGenerated;
+  final String? interpretation;
+  final Function(String) onInterpretationGenerated;
 
   const AiInterpretationPanel({
     super.key,
     required this.card,
     required this.questionController,
-    this.onInterpretationGenerated,
+    required this.interpretation,
+    required this.onInterpretationGenerated,
   });
 
   @override
@@ -25,7 +27,6 @@ class _AiInterpretationPanelState extends State<AiInterpretationPanel> {
   final AiService _aiService = AiService();
   final Config _config = Config();
   
-  String? _aiInterpretation;
   bool _isLoadingInterpretation = false;
   String? _errorMessage;
 
@@ -36,8 +37,8 @@ class _AiInterpretationPanelState extends State<AiInterpretationPanel> {
 
   /// Copy the interpretation to clipboard
   void _copyToClipboard() {
-    if (_aiInterpretation != null) {
-      Clipboard.setData(ClipboardData(text: _aiInterpretation!));
+    if (widget.interpretation != null) {
+      Clipboard.setData(ClipboardData(text: widget.interpretation!));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Interpretation copied to clipboard'),
@@ -83,11 +84,10 @@ Please provide a meaningful interpretation that connects the card's symbolism to
 
       if (mounted) {
         setState(() {
-          _aiInterpretation = interpretation;
           _isLoadingInterpretation = false;
         });
         // Notify parent that interpretation was generated
-        widget.onInterpretationGenerated?.call();
+        widget.onInterpretationGenerated(interpretation);
       }
     } catch (e) {
       if (mounted) {
@@ -105,7 +105,7 @@ Please provide a meaningful interpretation that connects the card's symbolism to
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Button to generate AI interpretation - only show if no interpretation yet
-        if (_aiInterpretation == null && !_isLoadingInterpretation)
+        if (widget.interpretation == null && !_isLoadingInterpretation)
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -132,7 +132,7 @@ Please provide a meaningful interpretation that connects the card's symbolism to
             ),
           ),
 
-        if (_isLoadingInterpretation || _aiInterpretation != null)
+        if (_isLoadingInterpretation || widget.interpretation != null)
           const SizedBox(height: 16),
 
         // Output section for AI interpretation
@@ -163,7 +163,7 @@ Please provide a meaningful interpretation that connects the card's symbolism to
             ),
           ),
 
-        if (_aiInterpretation != null && _errorMessage == null)
+        if (widget.interpretation != null && _errorMessage == null)
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -196,7 +196,7 @@ Please provide a meaningful interpretation that connects the card's symbolism to
                 const SizedBox(height: 8),
                 SingleChildScrollView(
                   child: SelectableText(
-                    _aiInterpretation!,
+                    widget.interpretation!,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
