@@ -172,18 +172,11 @@ class _MyHomePageState extends State<MyHomePage> {
             // Card display section - shown when a card is drawn
             if (_drawnCard != null && !_isLoading)
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TarotCardDisplay(card: _drawnCard!),
-                      const SizedBox(height: 24),
-                      // Pass the question controller to the interpretation panel
-                      AiInterpretationPanel(
-                        card: _drawnCard!,
-                        questionController: _questionController,
-                      ),
-                    ],
+                child: TarotCardDisplay(
+                  card: _drawnCard!,
+                  interpretationPanel: AiInterpretationPanel(
+                    card: _drawnCard!,
+                    questionController: _questionController,
                   ),
                 ),
               ),

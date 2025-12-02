@@ -3,10 +3,12 @@ import '../models/tarot_card.dart';
 
 class TarotCardDisplay extends StatelessWidget {
   final TarotCard card;
+  final Widget? interpretationPanel;
   
   const TarotCardDisplay({
     super.key,
     required this.card,
+    this.interpretationPanel,
   });
   
   @override
@@ -37,6 +39,10 @@ class TarotCardDisplay extends StatelessWidget {
                   _buildCardOrientation(context),
                   const SizedBox(height: 16),
                   _buildCardMeaning(context),
+                  if (interpretationPanel != null) ...[
+                    const SizedBox(height: 24),
+                    interpretationPanel!,
+                  ],
                 ],
               ),
             ),
@@ -64,6 +70,10 @@ class TarotCardDisplay extends StatelessWidget {
             _buildCardOrientation(context),
             const SizedBox(height: 16),
             _buildCardMeaning(context),
+            if (interpretationPanel != null) ...[
+              const SizedBox(height: 24),
+              interpretationPanel!,
+            ],
           ],
         ),
       );
