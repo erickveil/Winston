@@ -6,6 +6,7 @@ import 'models/config.dart';
 import 'models/tarot_card.dart';
 import 'services/card_index_service.dart';
 import 'services/tarot_service.dart';
+import 'widgets/ai_interpretation_panel.dart';
 import 'widgets/card_display.dart';
 import 'widgets/draw_button.dart';
 import 'widgets/settings_form.dart';
@@ -121,7 +122,16 @@ class _MyHomePageState extends State<MyHomePage> {
             // Card display secion - shown when a card is drawn
             if (_drawnCard != null && !_isLoading)
               Expanded(
-                child: TarotCardDisplay(card: _drawnCard!),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TarotCardDisplay(card: _drawnCard!),
+                      const SizedBox(height: 24),
+                      AiInterpretationPanel(card: _drawnCard!),
+                    ],
+                  ),
+                ),
               ),
 
             // Button for drawing a card

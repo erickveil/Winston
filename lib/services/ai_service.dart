@@ -5,6 +5,7 @@ import '../models/config.dart';
 /// Service class for communicating with LLM APIs
 class AiService {
   final Config _config = Config();
+  static const String _debugTag = '[AiService]';
 
   /// Sends a message to the LLM and returns the assistant's response
   /// 
@@ -19,6 +20,28 @@ class AiService {
     double temperature = 1.0,
   }) async {
     try {
+      print('$_debugTag Preparing request to: ${_config.url}');
+      print('$_debugTag Using model: ${_config.model}');
+      
+      final requestBody = {
+        'model': _config.model,
+        'temperature': temperature,
+        'stream': false,
+        'messages': [
+          {
+            'role': 'system',
+            'content': systemMessage,
+          },
+          {
+            'role': 'user',
+            'content': userMessage,
+          },
+        ],
+      };
+
+      print('$_debugTag Request body:');
+      print(jsonEncode(requestBody));
+
       final response = await http.post(
         Uri.parse(_config.url),
         headers: {
@@ -26,38 +49,43 @@ class AiService {
           if (_config.authorization.isNotEmpty)
             'Authorization': 'Bearer ${_config.authorization}',
         },
-        body: jsonEncode({
-          'model': _config.model,
-          'temperature': temperature,
-          'stream': false,
-          'messages': [
-            {
-              'role': 'system',
-              'content': systemMessage,
-            },
-            {
-              'role': 'user',
-              'content': userMessage,
-            },
-          ],
-        }),
+        body: jsonEncode(requestBody),
       );
+
+      print('$_debugTag Response status code: ${response.statusCode}');
+      print('$_debugTag Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         
-        // Extract the assistant's response from the API response
-        // This assumes a standard OpenAI-compatible API format
-        final assistantMessage = jsonResponse['choices'][0]['message']['content'];
-        return assistantMessage as String;
+        // Handle both OpenAI and Ollama API formats
+        String assistantMessage;
+        
+        // Try Ollama format first (message.content)
+        if (jsonResponse['message'] != null && jsonResponse['message']['content'] != null) {
+          assistantMessage = jsonResponse['message']['content'] as String;
+          print('$_debugTag Parsed response using Ollama format');
+        }
+        // Fall back to OpenAI format (choices[0].message.content)
+        else if (jsonResponse['choices'] != null && jsonResponse['choices'].isNotEmpty) {
+          assistantMessage = jsonResponse['choices'][0]['message']['content'] as String;
+          print('$_debugTag Parsed response using OpenAI format');
+        }
+        else {
+          throw Exception('Unable to parse response - unexpected format: ${response.body}');
+        }
+        
+        print('$_debugTag Successfully extracted response: $assistantMessage');
+        return assistantMessage;
       } else {
-        throw Exception(
-          'Failed to get response from LLM. '
+        final errorMsg = 'Failed to get response from LLM. '
           'Status: ${response.statusCode}, '
-          'Body: ${response.body}',
-        );
+          'Body: ${response.body}';
+        print('$_debugTag ERROR: $errorMsg');
+        throw Exception(errorMsg);
       }
     } catch (e) {
+      print('$_debugTag EXCEPTION: Error communicating with LLM: $e');
       throw Exception('Error communicating with LLM: $e');
     }
   }
@@ -77,6 +105,11 @@ class AiService {
     int? maxTokens,
   }) async {
     try {
+      print('$_debugTag Preparing advanced request to: ${_config.url}');
+      print('$_debugTag Using model: ${_config.model}');
+      print('$_debugTag Temperature: $temperature');
+      if (maxTokens != null) print('$_debugTag Max tokens: $maxTokens');
+      
       final Map<String, dynamic> requestBody = {
         'model': _config.model,
         'temperature': temperature,
@@ -98,6 +131,9 @@ class AiService {
         requestBody['max_tokens'] = maxTokens;
       }
 
+      print('$_debugTag Request body:');
+      print(jsonEncode(requestBody));
+
       final response = await http.post(
         Uri.parse(_config.url),
         headers: {
@@ -108,18 +144,40 @@ class AiService {
         body: jsonEncode(requestBody),
       );
 
+      print('$_debugTag Response status code: ${response.statusCode}');
+      print('$_debugTag Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        final assistantMessage = jsonResponse['choices'][0]['message']['content'];
-        return assistantMessage as String;
+        
+        // Handle both OpenAI and Ollama API formats
+        String assistantMessage;
+        
+        // Try Ollama format first (message.content)
+        if (jsonResponse['message'] != null && jsonResponse['message']['content'] != null) {
+          assistantMessage = jsonResponse['message']['content'] as String;
+          print('$_debugTag Parsed response using Ollama format');
+        }
+        // Fall back to OpenAI format (choices[0].message.content)
+        else if (jsonResponse['choices'] != null && jsonResponse['choices'].isNotEmpty) {
+          assistantMessage = jsonResponse['choices'][0]['message']['content'] as String;
+          print('$_debugTag Parsed response using OpenAI format');
+        }
+        else {
+          throw Exception('Unable to parse response - unexpected format: ${response.body}');
+        }
+        
+        print('$_debugTag Successfully extracted response: $assistantMessage');
+        return assistantMessage;
       } else {
-        throw Exception(
-          'Failed to get response from LLM. '
+        final errorMsg = 'Failed to get response from LLM. '
           'Status: ${response.statusCode}, '
-          'Body: ${response.body}',
-        );
+          'Body: ${response.body}';
+        print('$_debugTag ERROR: $errorMsg');
+        throw Exception(errorMsg);
       }
     } catch (e) {
+      print('$_debugTag EXCEPTION: Error communicating with LLM: $e');
       throw Exception('Error communicating with LLM: $e');
     }
   }
@@ -130,6 +188,9 @@ class AiService {
   /// Returns true if connection is successful, false otherwise
   Future<bool> testConnection() async {
     try {
+      print('$_debugTag Testing connection to: ${_config.url}');
+      print('$_debugTag Using model: ${_config.model}');
+      
       final response = await http.post(
         Uri.parse(_config.url),
         headers: {
@@ -150,12 +211,24 @@ class AiService {
         }),
       ).timeout(
         const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Request timeout'),
+        onTimeout: () {
+          print('$_debugTag ERROR: Connection timeout after 10 seconds');
+          throw Exception('Request timeout');
+        },
       );
 
-      return response.statusCode == 200;
+      print('$_debugTag Connection test response status: ${response.statusCode}');
+      print('$_debugTag Connection test response body: ${response.body}');
+      
+      if (response.statusCode == 200) {
+        print('$_debugTag Connection test SUCCESSFUL');
+        return true;
+      } else {
+        print('$_debugTag Connection test FAILED with status ${response.statusCode}');
+        return false;
+      }
     } catch (e) {
-      print('Connection test failed: $e');
+      print('$_debugTag Connection test EXCEPTION: $e');
       return false;
     }
   }
