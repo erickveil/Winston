@@ -22,15 +22,9 @@ class CardIndexService {
   static Future<CardIndexService> initialize() async {
     final service = CardIndexService();
     
-    // Load image paths from assets
-    final manifestContent = await rootBundle.loadString('AssetManifest.json');
-    final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-    
-    // Filter for image files
-    final imagePaths = manifestMap.keys
-        .where((String key) => key.startsWith('assets/images/') && 
-              (key.endsWith('.jpg') || key.endsWith('.png')))
-        .toList();
+    // Generate image paths programmatically since AssetManifest.json is not
+    // reliably available in newer Flutter versions
+    final imagePaths = _generateImagePaths();
     
     // Load JSON data
     final String jsonString = await rootBundle.loadString('assets/tarotData.json');
@@ -41,6 +35,43 @@ class CardIndexService {
     
     print('Card index built with ${service.index.length} matches');
     return service;
+  }
+
+  /// Generates the list of all 78 tarot card image paths
+  /// This avoids dependency on AssetManifest.json which is not available in newer Flutter versions
+  static List<String> _generateImagePaths() {
+    const prefix = '0912190455860';
+    final List<String> paths = [];
+    
+    // Major Arcana (0-21)
+    final majorArcana = [
+      '0_Fool', '1_Magician', '2_High_Priestess', '3_Empress', '4_Emperor',
+      '5_Hierophant', '6_Lovers', '7_Chariot', '8_Strength', '9_Hermit',
+      '10_Wheel_of_Fortune', '11_Justice', '12_Hanged_Man', '13_Death',
+      '14_Temperance', '15_Devil', '16_Tower', '17_Star', '18_Moon',
+      '19_Sun', '20_Judgement', '21_World'
+    ];
+    
+    for (int i = 0; i < majorArcana.length; i++) {
+      paths.add('assets/images/${prefix}_${i.toString().padLeft(2, '0')}_${majorArcana[i]}.jpg');
+    }
+    
+    // Minor Arcana
+    final suits = ['Wand', 'Cup', 'Sword', 'Pentacle'];
+    final ranks = [
+      '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+      'Page', 'Knight', 'Queen', 'King'
+    ];
+    
+    int cardNumber = 22; // Start after major arcana
+    for (final suit in suits) {
+      for (final rank in ranks) {
+        paths.add('assets/images/${prefix}_${cardNumber}_${suit}_$rank.jpg');
+        cardNumber++;
+      }
+    }
+    
+    return paths;
   }
 
   /// Builds the card index by matching image filenames with their corresponding 
